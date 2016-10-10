@@ -21,21 +21,26 @@ matchingWords i ws = filter(\x -> length x > 1) . nub $ intersect (ps) wsl
 
 
 
-findWords :: [String] -> String -> [String]
-findWords [] ws = [""]
+findWords :: [String] -> String -> Bool ->  [String]
+findWords [] ws r = [""]
 
 -- finds matching words, stops after first words have been found.
-findWords i ws =
-        if (length resultSet) /= 0
+findWords i ws r =
+        if ( (length resultSet) /= 0 && r == True)
             then concat resultSet
+        else if ( (length resultSet) /= 0 && r == False)
+            then (concat resultSet) ++ (findWords (removeLetter (last i)) ws r)
         else
-            findWords (removeLetter (last i)) ws
+            findWords (removeLetter (last i)) ws r
     where resultSet = filter(\y -> y /= []) $ map (\x -> matchingWords x ws) i
 
 
 
+-- i : input word
+-- wf : word file
+-- a (True/False) : find all, or return after first one found.
 main = do
-    [i,wf] <- getArgs
+    [i,wf,r] <- getArgs
     contents <- readFile wf
-    putStrLn $ show (findWords (i:[]) contents)
+    putStrLn $ show $ nub $ init (findWords (i:[]) contents (read r :: Bool))
 
