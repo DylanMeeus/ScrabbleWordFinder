@@ -2,12 +2,6 @@ import Data.List as DL
 import System.Environment
 import System.IO
 
-
--- I could maybe add a flag to not break the search after the first matches have been found.
-
-buildPermutations i = permutations i
-
-
 -- create a list of words where there is always a different letter missing from the original
 removeLetter :: String -> [String]
 removeLetter w = [take (x-1) w ++ take (l-x) (reverse w) | x <- [1..l]]
@@ -16,7 +10,7 @@ removeLetter w = [take (x-1) w ++ take (l-x) (reverse w) | x <- [1..l]]
 
 -- finds matching words, removes single letters
 matchingWords i ws = filter(\x -> length x > 1) . nub $ intersect (ps) wsl
-    where ps =  buildPermutations i
+    where ps =  permutations i
           wsl = lines ws
 
 
@@ -38,9 +32,9 @@ findWords i ws r =
 
 -- i : input word
 -- wf : word file
--- a (True/False) : find all, or return after first one found.
+-- r (True/False) : find all, or return after first one found.
 main = do
     [i,wf,r] <- getArgs
     contents <- readFile wf
-    putStrLn $ show $ nub $ init (findWords (i:[]) contents (read r :: Bool))
+    putStrLn $ show $ nub $ filter(\x -> x /= "")  (findWords (i:[]) contents (read r :: Bool))
 
