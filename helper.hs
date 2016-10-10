@@ -1,20 +1,9 @@
--- finds words in a list, based on permuations of input
--- We don't need to use all letters provided, but the more, the better
-    -- Permutate over the
-    -- Well actually different letters have different values, I could probably hook that up
-
 import Data.List as DL
 import System.Environment
 import System.IO
 
 
-
--- build a list of permutations of the provided letters
-
-
---- we also want permutations of every 'smaller part'
--- I actually want a combinatorial selection here
--- for i = 0, i <= n, select all ways to take n from word
+-- I could maybe add a flag to not break the search after the first matches have been found.
 
 buildPermutations i = permutations i
 
@@ -25,17 +14,24 @@ removeLetter w = [take (x-1) w ++ take (l-x) (reverse w) | x <- [1..l]]
     where l = length w
 
 
-matchingWords i ws = nub $ intersect (ps) wsl
+-- finds matching words, removes single letters
+matchingWords i ws = filter(\x -> length x > 1) . nub $ intersect (ps) wsl
     where ps =  buildPermutations i
           wsl = lines ws
 
 
+
+findWords :: [String] -> String -> [String]
+findWords [] ws = [""]
+
+-- finds matching words, stops after first words have been found.
 findWords i ws =
         if (length resultSet) /= 0
-            then resultSet
+            then concat resultSet
         else
             findWords (removeLetter (last i)) ws
     where resultSet = filter(\y -> y /= []) $ map (\x -> matchingWords x ws) i
+
 
 
 main = do
